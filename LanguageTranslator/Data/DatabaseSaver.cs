@@ -9,13 +9,13 @@ namespace LanguageTranslator.Data
         {
             using (SqlConnection connection = new SqlConnection("Data Source=.\\SQLEXPRESS;Initial Catalog=Languages;Integrated Security=True"))
             {
-                string sqlExpression = $"INSERT INTO RU_EN (Word, Translate) VALUES (@Word, @Translate)";
+                string sqlExpression = $"INSERT INTO RU_EN (Id, Word, Translate) VALUES (@Id, @Word, @Translate)";
                 using (SqlCommand command = new SqlCommand(sqlExpression, connection))
                 {
                     connection.Open();
-
                     foreach (var translate in Words.translates)
                     {
+                        command.Parameters.AddWithValue("@Id", translate.Id);
                         command.Parameters.AddWithValue("@Word", translate.Word);
                         command.Parameters.AddWithValue("@Translate", translate.Translate);
                         command.ExecuteNonQuery();

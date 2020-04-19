@@ -4,6 +4,8 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 using LanguageTranslator.Data;
+using LanguageTranslator.Data.Repositories;
+using LanguageTranslator.Interfaces;
 using LanguageTranslator.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -30,12 +32,13 @@ namespace LanguageTranslator
                     connection.Open();
 
                     SqlDataReader reader = command.ExecuteReader();
-                    while(reader.Read())
+                    while (reader.Read())
                     {
                         Words.translates.AddLast(new TranslateWord
                         {
-                            Word = reader.GetString(0),
-                            Translate = reader.GetString(1)
+                            Id = reader.GetInt32(0),
+                            Word = reader.GetString(1),
+                            Translate = reader.GetString(2)
                         });
                     }
                     connection.Close();
@@ -49,7 +52,9 @@ namespace LanguageTranslator
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
-            services.AddMvc();
+            services.AddTransient<IDataSaver, DatabaseSaver>();
+            services.AddTransient<ITranslates, TranslateRepository>();
+            services.AddTransient<ISearch, SearchRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
