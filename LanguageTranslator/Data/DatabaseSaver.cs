@@ -1,63 +1,88 @@
-﻿using System.Data;
+﻿using LanguageTranslator.Enums;
+using LanguageTranslator.Models;
+using LanguageTranslator.Services;
+using System.Configuration;
+using System.Data;
 using System.Data.SqlClient;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace LanguageTranslator.Data
 {
     public class DatabaseSaver : IDataSaver
     {
-        public void Save()
+        protected string Connection { get; } = ConnectionStringUtility.GetConnectionString();
+
+        public async override Task SaveTranslate(TranslateWord translate)
         {
-            using (SqlConnection connection = new SqlConnection("Data Source=.\\SQLEXPRESS;Initial Catalog=Languages;Integrated Security=True"))
+            if (HasCurrentTranslate(translate.Translate) || HasCurrentWord(translate.Word))
             {
-                string sqlExpression = $"INSERT INTO RU_EN (Id, Word, Translate) VALUES (@Id, @Word, @Translate)";
+                Status = AddStatus.HAS_TRANSLATE;
+                return;
+            }
+
+            using (SqlConnection connection = new SqlConnection(Connection))
+            {
+                string sqlExpression = "INSERT INTO RU_EN (Word, Translate) VALUES (@Word, @Translate)";
                 using (SqlCommand command = new SqlCommand(sqlExpression, connection))
                 {
-                    connection.Open();
-                    foreach (var translate in Words.translates)
-                    {
-                        command.Parameters.AddWithValue("@Id", translate.Id);
-                        command.Parameters.AddWithValue("@Word", translate.Word);
-                        command.Parameters.AddWithValue("@Translate", translate.Translate);
-                        command.ExecuteNonQuery();
-                    }
+                    await connection.OpenAsync();
+                    command.Parameters.AddWithValue("@Word", translate.Word);
+                    command.Parameters.AddWithValue("@Translate", translate.Translate);
+                    await command.ExecuteNonQueryAsync();
                 }
-                SortTranslates(connection);
+
+                await SortTranslates(connection);
 
                 if (connection.State == ConnectionState.Open)
                 {
-                    connection.Close();
+                    await connection.CloseAsync();
                 }
             }
         }
 
-        public static void SortTranslates()
+        public override bool HasCurrentTranslate(string translate)
         {
-            using (SqlConnection connection = new SqlConnection("Data Source=.\\SQLEXPRESS;Initial Catalog=Languages;Integrated Security=True"))
+            // TODO: Реализация проверки в БД
+            return Words.translates.Any(t =>
+                t.Translate.Trim().ToLower() == translate.Trim().ToLower());
+        }
+
+        public override bool HasCurrentWord(string word)
+        {
+            // TODO: Реализация проверки в БД
+            return Words.translates.Any(t =>
+                t.Word.Trim().ToLower() == word.Trim().ToLower());
+        }
+
+        public async override Task SortTranslates()
+        {
+            using (SqlConnection connection = new SqlConnection(Connection))
             {
                 string sqlExpression = "SortWords";
                 using (SqlCommand command = new SqlCommand(sqlExpression, connection))
                 {
-                    connection.Open();
-                    command.CommandType = System.Data.CommandType.StoredProcedure;
-                    command.ExecuteNonQuery();
+                    await connection.OpenAsync();
+                    command.CommandType = CommandType.StoredProcedure;
+                    await command.ExecuteNonQueryAsync();
                 }
                 connection.Close();
             }
         }
 
-        public static void SortTranslates(SqlConnection connection)
+        public async Task SortTranslates(SqlConnection connection)
         {
             string sqlExpression = "SortWords";
             using (SqlCommand command = new SqlCommand(sqlExpression, connection))
             {
                 if (connection.State == ConnectionState.Closed)
                 {
-                    connection.Open();
+                    await connection.OpenAsync();
                 }
                 command.CommandType = CommandType.StoredProcedure;
-                command.ExecuteNonQuery();
+                await command.ExecuteNonQueryAsync();
             }
-            connection.Close();
+            await connection.CloseAsync();
         }
     }
 }

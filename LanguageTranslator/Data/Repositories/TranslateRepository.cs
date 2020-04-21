@@ -1,4 +1,5 @@
-﻿using LanguageTranslator.Interfaces;
+﻿using LanguageTranslator.Enums;
+using LanguageTranslator.Interfaces;
 using LanguageTranslator.Models;
 using System;
 using System.Collections.Generic;
@@ -9,25 +10,58 @@ namespace LanguageTranslator.Data.Repositories
 {
     public class TranslateRepository : ITranslates
     {
-        public void Add(TranslateWord trans)
+        private readonly IDataSaver saver;
+        public AddStatus Status { get; set; }
+
+        public TranslateRepository(IDataSaver saver)
         {
+            this.saver = saver;
+        }
+
+        public async Task Add(TranslateWord trans)
+        {
+            await saver.SaveTranslate(trans);
+
+            Status = saver.Status;
+
+            if (Status == AddStatus.HAS_TRANSLATE)
+            {
+                return;
+            }
+
             Words.translates.AddLast(new TranslateWord
             {
-                Word = trans.Word.ToLower(),
-                Translate = trans.Translate.ToLower()
+                Word = trans.Word,
+                Translate = trans.Translate
             });
 
             Words.translates.OrderBy(w => w.Word);
         }
 
-        public bool HasCurrentWord(string word)
+        public bool IsCorrectLanguage(TranslateWord trans)
         {
-            return Words.translates.Any(t => t.Word.Trim() == word);
-        }
+            bool translateIsEn = true, wordIsRu = true;
 
-        public bool HasTranslateWord(string translate)
-        {
-            return Words.translates.Any(t => t.Translate.Trim() == translate);
+            foreach (char ch in trans.Word.Trim().ToLower())
+            {
+                if (ch >= 'а' && ch <= 'я')
+                    wordIsRu = true;
+                else
+                    wordIsRu = false;
+            }
+
+            foreach (char ch in trans.Translate.Trim().ToLower())
+            {
+                if (ch >= 'a' && ch <= 'z')
+                    translateIsEn = true;
+                else
+                    translateIsEn = false;
+            }
+
+            if (wordIsRu && translateIsEn)
+                return true;
+            else
+                return false;
         }
     }
 }

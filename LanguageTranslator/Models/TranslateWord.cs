@@ -1,12 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
-using System;
+﻿using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 
 namespace LanguageTranslator.Models
 {
     public class TranslateWord
     {
-        [BindNever]
+        [Key]
+        [HiddenInput(DisplayValue = false)]
         public int Id { get; set; }
 
         [MinLength(1)]

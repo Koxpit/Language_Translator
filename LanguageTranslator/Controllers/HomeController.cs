@@ -2,64 +2,69 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using LanguageTranslator.Models;
-using LanguageTranslator.Data;
-using System.Linq;
 using LanguageTranslator.Interfaces;
 using LanguageTranslator.ViewModels;
+using System.Threading.Tasks;
+using LanguageTranslator.Enums;
 
 namespace LanguageTranslator.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly IDataSaver saver;
         private readonly ITranslates translates;
         private readonly ISearch search;
 
-        public HomeController(IDataSaver saver, ITranslates translates, ISearch search)
+        public HomeController(ITranslates translates, ISearch search)
         {
-            this.saver = saver;
             this.translates = translates;
             this.search = search;
         }
 
+        [HttpGet]
         public IActionResult Index()
         {
             return View();
         }
         
         [HttpPost]
-        public IActionResult Translate(TranslateWord trans)
+        public async Task<IActionResult> Translate(TranslateWord trans)
         {
             if (ModelState.IsValid)
             {
-                if (HasCurrentTranslate(trans))
+                if (!IsCorrectLanguage(trans))
                 {
                     return View();
                 }
 
-                translates.Add(trans);
+                await translates.Add(trans);
 
-                saver.Save();
+                if (HasCurrentTranslate())
+                {
+                    return View();
+                }
 
-                return RedirectToAction("Home", "Index");
+                return View();
             }
+
             return View();
         }
 
-        private bool HasCurrentTranslate(TranslateWord trans)
+        private bool IsCorrectLanguage(TranslateWord trans)
         {
-            bool hasWord = translates.HasCurrentWord(trans.Word);
-            bool hasTranslate = translates.HasTranslateWord(trans.Translate);
-
-            if (hasWord)
+            if (!translates.IsCorrectLanguage(trans))
             {
-                ViewData["StatusTranslate"] = "Исходное слово уже существует.";
-                return true;
+                ViewData["StatusTranslate"] = "Перевод не добавлен. Исходное слово должно быть русское, а перевод английским!";
+                return false;
             }
 
-            if (hasTranslate)
+            return true;
+        }
+
+        private bool HasCurrentTranslate()
+        {
+            if (translates.Status == AddStatus.HAS_TRANSLATE)
             {
-                ViewData["StatusTranslate"] = "Перевод данного слова уже существует";
+                ViewData["StatusTranslate"] = "Перевод уже существует.";
                 return true;
             }
 

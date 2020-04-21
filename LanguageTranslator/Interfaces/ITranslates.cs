@@ -1,4 +1,5 @@
-﻿using LanguageTranslator.Models;
+﻿using LanguageTranslator.Enums;
+using LanguageTranslator.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,8 +9,8 @@ namespace LanguageTranslator.Interfaces
 {
     public interface ITranslates
     {
-        void Add(TranslateWord trans);
-        bool HasCurrentWord(string word);
-        bool HasTranslateWord(string translate);
+        Task Add(TranslateWord trans);
+        AddStatus Status { get; set; }
+        bool IsCorrectLanguage(TranslateWord trans);
     }
 }
