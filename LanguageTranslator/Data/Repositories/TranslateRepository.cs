@@ -18,9 +18,9 @@ namespace LanguageTranslator.Data.Repositories
             this.saver = saver;
         }
 
-        public async Task Add(TranslateWord trans)
+        public void Add(TranslateWord trans)
         {
-            await saver.SaveTranslate(trans);
+            saver.SaveTranslate(trans);
 
             Status = saver.Status;
 

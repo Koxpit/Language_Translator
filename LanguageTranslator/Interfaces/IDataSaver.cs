@@ -12,9 +12,8 @@ namespace LanguageTranslator.Data
     {
         public AddStatus Status { get; set; }
 
-        public abstract Task SaveTranslate(TranslateWord translate);
-        public abstract bool HasCurrentWord(string word);
-        public abstract bool HasCurrentTranslate(string word);
-        public abstract Task SortTranslates();
+        public abstract void SaveTranslate(TranslateWord translate);
+        public abstract bool HasTranslate(TranslateWord translate);
+        public abstract void SortTranslates();
     }
 }

@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace LanguageTranslator.Models
 {
+    [Serializable]
     public class TranslateWord
     {
         [Key]

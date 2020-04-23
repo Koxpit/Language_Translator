@@ -1,31 +1,76 @@
-﻿using LanguageTranslator.Models;
+﻿using LanguageTranslator.Enums;
+using LanguageTranslator.Models;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading.Tasks;
 
 namespace LanguageTranslator.Data
 {
     public class FileSaver : IDataSaver
     {
-        public override bool HasCurrentTranslate(string word)
+        public override void SaveTranslate(TranslateWord translate)
         {
-            throw new NotImplementedException();
+            if (HasTranslate(translate))
+            {
+                Status = AddStatus.HAS_TRANSLATE;
+                return;
+            }
+
+            Status = AddStatus.HAS_NOT_TRANSLATE;
+
+            LinkedList<TranslateWord> translates = DeserializeData();
+            translates.AddLast(translate);
+
+            SerializeData(translates);
         }
 
-        public override bool HasCurrentWord(string word)
+        private void SerializeData(LinkedList<TranslateWord> translates)
         {
-            throw new NotImplementedException();
+            using (FileStream fs = new FileStream("ru-en.dat", FileMode.OpenOrCreate))
+            {
+                BinaryFormatter formatter = new BinaryFormatter();
+                formatter.Serialize(fs, translates);
+            }
         }
 
-        public override Task SaveTranslate(TranslateWord translate)
+        private LinkedList<TranslateWord> DeserializeData()
         {
-            throw new NotImplementedException();
+            using (FileStream fs = new FileStream("ru-en.dat", FileMode.OpenOrCreate))
+            {
+                if (fs.Length != 0)
+                {
+                    BinaryFormatter formatter = new BinaryFormatter();
+                    return (LinkedList<TranslateWord>)formatter.Deserialize(fs);
+                }
+            }
+            return new LinkedList<TranslateWord>();
         }
 
-        public override Task SortTranslates()
+        public override bool HasTranslate(TranslateWord translate)
         {
-            throw new NotImplementedException();
+            LinkedList<TranslateWord> translates = DeserializeData();
+            bool hasWord, hasTranslate;
+
+            hasWord = translates.Any(t =>
+                t.Word.Trim().ToLower() == translate.Word.Trim().ToLower());
+
+            hasTranslate = translates.Any(t =>
+                t.Translate.Trim().ToLower() == translate.Translate.Trim().ToLower());
+
+            if (hasWord || hasTranslate)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        public override void SortTranslates()
+        {
+            //TODO: реализовать сортировку записей файла.
         }
     }
 }

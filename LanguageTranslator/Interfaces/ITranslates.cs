@@ -9,7 +9,7 @@ namespace LanguageTranslator.Interfaces
 {
     public interface ITranslates
     {
-        Task Add(TranslateWord trans);
+        void Add(TranslateWord trans);
         AddStatus Status { get; set; }
         bool IsCorrectLanguage(TranslateWord trans);
     }

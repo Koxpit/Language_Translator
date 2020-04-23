@@ -31,13 +31,15 @@ namespace LanguageTranslator
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
+
             services.AddTransient<IDataSaver, DatabaseSaver>();
             services.AddTransient<ITranslates, TranslateRepository>();
             services.AddTransient<ISearch, SearchRepository>();
+            services.AddTransient<IInitializer, DBInitializer>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IInitializer initializer)
         {
             if (env.IsDevelopment())
             {
@@ -51,6 +53,7 @@ namespace LanguageTranslator
             }
 
             ConnectionString = Configuration["ConnectionStrings:DefaultConnection"];
+            initializer.Initialize();
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
@@ -65,6 +68,7 @@ namespace LanguageTranslator
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
             });
+
         }
     }
 }

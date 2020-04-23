@@ -11,15 +11,17 @@ namespace LanguageTranslator.Data
 {
     public class DatabaseSaver : IDataSaver
     {
-        protected string Connection { get; } = ConnectionStringUtility.GetConnectionString();
+        private string Connection { get; } = ConnectionStringUtility.GetConnectionString();
 
-        public async override Task SaveTranslate(TranslateWord translate)
+        public async override void SaveTranslate(TranslateWord translate)
         {
-            if (HasCurrentTranslate(translate.Translate) || HasCurrentWord(translate.Word))
+            if (HasTranslate(translate))
             {
                 Status = AddStatus.HAS_TRANSLATE;
                 return;
             }
+
+            Status = AddStatus.HAS_NOT_TRANSLATE;
 
             using (SqlConnection connection = new SqlConnection(Connection))
             {
@@ -32,7 +34,7 @@ namespace LanguageTranslator.Data
                     await command.ExecuteNonQueryAsync();
                 }
 
-                await SortTranslates(connection);
+                SortTranslates(connection);
 
                 if (connection.State == ConnectionState.Open)
                 {
@@ -41,21 +43,13 @@ namespace LanguageTranslator.Data
             }
         }
 
-        public override bool HasCurrentTranslate(string translate)
+        public override bool HasTranslate(TranslateWord translate)
         {
             // TODO: Реализация проверки в БД
-            return Words.translates.Any(t =>
-                t.Translate.Trim().ToLower() == translate.Trim().ToLower());
+            return false;
         }
 
-        public override bool HasCurrentWord(string word)
-        {
-            // TODO: Реализация проверки в БД
-            return Words.translates.Any(t =>
-                t.Word.Trim().ToLower() == word.Trim().ToLower());
-        }
-
-        public async override Task SortTranslates()
+        public async override void SortTranslates()
         {
             using (SqlConnection connection = new SqlConnection(Connection))
             {
@@ -70,7 +64,7 @@ namespace LanguageTranslator.Data
             }
         }
 
-        public async Task SortTranslates(SqlConnection connection)
+        public async void SortTranslates(SqlConnection connection)
         {
             string sqlExpression = "SortWords";
             using (SqlCommand command = new SqlCommand(sqlExpression, connection))

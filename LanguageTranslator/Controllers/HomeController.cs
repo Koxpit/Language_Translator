@@ -27,7 +27,7 @@ namespace LanguageTranslator.Controllers
         }
         
         [HttpPost]
-        public async Task<IActionResult> Translate(TranslateWord trans)
+        public IActionResult Translate(TranslateWord trans)
         {
             if (ModelState.IsValid)
             {
@@ -36,7 +36,7 @@ namespace LanguageTranslator.Controllers
                     return View();
                 }
 
-                await translates.Add(trans);
+                translates.Add(trans);
 
                 if (HasCurrentTranslate())
                 {
