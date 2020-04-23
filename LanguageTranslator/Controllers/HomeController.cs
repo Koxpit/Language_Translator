@@ -1,11 +1,9 @@
-﻿using System.Diagnostics;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.AspNetCore.Mvc;
 using LanguageTranslator.Models;
 using LanguageTranslator.Interfaces;
 using LanguageTranslator.ViewModels;
-using System.Threading.Tasks;
 using LanguageTranslator.Enums;
+using LanguageTranslator.Data;
 
 namespace LanguageTranslator.Controllers
 {
@@ -23,11 +21,12 @@ namespace LanguageTranslator.Controllers
         [HttpGet]
         public IActionResult Index()
         {
+            ViewBag.translates = Words.SortTranslates();
             return View();
         }
-        
+
         [HttpPost]
-        public IActionResult Translate(TranslateWord trans)
+        public IActionResult Translate(TranslateWordModel trans)
         {
             if (ModelState.IsValid)
             {
@@ -49,8 +48,14 @@ namespace LanguageTranslator.Controllers
             return View();
         }
 
-        private bool IsCorrectLanguage(TranslateWord trans)
+        private bool IsCorrectLanguage(TranslateWordModel trans)
         {
+            if (trans.WordModel.Language == trans.TranslateModel.Language)
+            {
+                ViewData["StatusTranslate"] = "Вы выбрли два одинаковых языка. Выберите разные.";
+                return false;
+            }
+
             if (!translates.IsCorrectLanguage(trans))
             {
                 ViewData["StatusTranslate"] = "Перевод не добавлен. Исходное слово должно быть русское, а перевод английским!";

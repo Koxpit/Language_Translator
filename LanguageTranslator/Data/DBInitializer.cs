@@ -1,10 +1,7 @@
-﻿using LanguageTranslator.Interfaces;
+﻿using LanguageTranslator.Enums;
+using LanguageTranslator.Interfaces;
 using LanguageTranslator.Models;
-using System;
-using System.Collections.Generic;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace LanguageTranslator.Data
 {
@@ -22,16 +19,21 @@ namespace LanguageTranslator.Data
                     SqlDataReader reader = await command.ExecuteReaderAsync();
                     while (await reader.ReadAsync())
                     {
-                        Words.translates.AddLast(new TranslateWord
+                        Words.translates.AddLast(new TranslateWordModel()
                         {
                             Id = reader.GetInt32(0),
-                            Word = reader.GetString(1),
-                            Translate = reader.GetString(2)
+                            WordModel = new WordModel()
+                            {
+                                Word = reader.GetString(1),
+                                Language = (Languages)reader.GetInt32(3)
+                            },
+                            TranslateModel = new TranslateModel() {
+                               Translate = reader.GetString(2),
+                               Language = (Languages)reader.GetInt32(4)
+                            }
                         });
                     }
                     await connection.CloseAsync();
-
-                    Words.translates.OrderBy(w => w.Word);
                 }
             }
         }

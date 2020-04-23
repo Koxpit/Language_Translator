@@ -1,16 +1,13 @@
 ﻿using LanguageTranslator.Enums;
 using LanguageTranslator.Interfaces;
 using LanguageTranslator.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace LanguageTranslator.Data.Repositories
 {
     public class TranslateRepository : ITranslates
     {
         private readonly IDataSaver saver;
+
         public AddStatus Status { get; set; }
 
         public TranslateRepository(IDataSaver saver)
@@ -18,7 +15,7 @@ namespace LanguageTranslator.Data.Repositories
             this.saver = saver;
         }
 
-        public void Add(TranslateWord trans)
+        public void Add(TranslateWordModel trans)
         {
             saver.SaveTranslate(trans);
 
@@ -29,20 +26,19 @@ namespace LanguageTranslator.Data.Repositories
                 return;
             }
 
-            Words.translates.AddLast(new TranslateWord
+            Words.translates.AddLast(new TranslateWordModel
             {
-                Word = trans.Word,
-                Translate = trans.Translate
+                WordModel = trans.WordModel,
+                TranslateModel = trans.TranslateModel
             });
-
-            Words.translates.OrderBy(w => w.Word);
         }
 
-        public bool IsCorrectLanguage(TranslateWord trans)
+        public bool IsCorrectLanguage(TranslateWordModel trans)
         {
+            
             bool translateIsEn = true, wordIsRu = true;
 
-            foreach (char ch in trans.Word.Trim().ToLower())
+            foreach (char ch in trans.WordModel.Word.Trim().ToLower())
             {
                 if (ch >= 'а' && ch <= 'я')
                     wordIsRu = true;
@@ -50,7 +46,7 @@ namespace LanguageTranslator.Data.Repositories
                     wordIsRu = false;
             }
 
-            foreach (char ch in trans.Translate.Trim().ToLower())
+            foreach (char ch in trans.TranslateModel.Translate.Trim().ToLower())
             {
                 if (ch >= 'a' && ch <= 'z')
                     translateIsEn = true;

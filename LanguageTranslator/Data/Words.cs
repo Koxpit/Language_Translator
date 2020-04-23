@@ -1,15 +1,17 @@
-﻿using LanguageTranslator.Interfaces;
-using LanguageTranslator.Models;
-using LanguageTranslator.Services;
+﻿using LanguageTranslator.Models;
 using System.Collections.Generic;
-using System.Data.SqlClient;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace LanguageTranslator.Data
 {
     public class Words
     {
-        public static LinkedList<TranslateWord> translates = new LinkedList<TranslateWord>();
+        public static LinkedList<TranslateWordModel> translates = new LinkedList<TranslateWordModel>();
+
+        public static IOrderedEnumerable<TranslateWordModel> SortTranslates()
+        {
+            IOrderedEnumerable<TranslateWordModel> result = translates.OrderBy(w => w.WordModel.Word);
+            return result;
+        }
     }
 }

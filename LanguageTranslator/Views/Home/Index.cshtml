@@ -1,5 +1,5 @@
-﻿@using LanguageTranslator.Data;
-@model TranslateWord
+﻿@using LanguageTranslator.Enums
+@model TranslateWordModel
 
 @{
     ViewData["Title"] = "Home Page";
@@ -15,22 +15,25 @@
 
 <h4 class="mt-4">Вы можете добавить перевод (RU-EN)</h4>
 <div class="row">
-    <form asp-action="Translate" method="post" class="form-horizontal">
+    <form asp-action="Translate" method="post" class="form-horizontal" autocomplete="on">
+        <div>
+            <select asp-for="WordModel.Language" asp-items="Html.GetEnumSelectList<Languages>()"></select>
+            <select asp-for="TranslateModel.Language" asp-items="Html.GetEnumSelectList<Languages>()"></select>
+        </div>
         <div class="form-group">
-            <label asp-for="Word"></label>
+            <label asp-for="WordModel.Word"></label>
             <div class="col-md-12">
-                <input asp-for="Word" class="form-control" />
-                <span asp-validation-for="Word" class="text-danger"></span>
+                <input asp-for="WordModel.Word" class="form-control" />
+                <span asp-validation-for="WordModel.Word" class="text-danger"></span>
             </div>
         </div>
         <div class="form-group">
-            <label asp-for="Translate"></label>
+            <label asp-for="TranslateModel.Translate"></label>
             <div class="col-md-12">
-                <input asp-for="Translate" class="form-control" />
-                <span asp-validation-for="Translate" class="text-danger"></span>
+                <input asp-for="TranslateModel.Translate" class="form-control" />
+                <span asp-validation-for="TranslateModel.Translate" class="text-danger"></span>
             </div>
         </div>
-        <h4>@ViewData["StatusTranslate"]</h4>
         <input class="btn-success" type="submit" value="Добавить" />
     </form>
 </div>
@@ -38,11 +41,11 @@
 <h4 class="row mt-4">Текущие переводы:</h4>
 <table class="row mt-4">
     <tr><td><b>Word</b></td> <td><b>Translate</b></td></tr>
-    @foreach (var translate in Words.translates)
+    @foreach (var translate in ViewBag.translates)
     {
         <tr>
-            <td>@translate.Word</td>
-            <td>@translate.Translate</td>
+            <td>@translate.WordModel.Word</td>
+            <td>@translate.TranslateModel.Translate</td>
         </tr>
     }
 </table>

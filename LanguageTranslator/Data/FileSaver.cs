@@ -1,17 +1,15 @@
 ﻿using LanguageTranslator.Enums;
 using LanguageTranslator.Models;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
-using System.Threading.Tasks;
 
 namespace LanguageTranslator.Data
 {
     public class FileSaver : IDataSaver
     {
-        public override void SaveTranslate(TranslateWord translate)
+        public override void SaveTranslate(TranslateWordModel translate)
         {
             if (HasTranslate(translate))
             {
@@ -24,7 +22,7 @@ namespace LanguageTranslator.Data
             }
         }
 
-        private void SerializeData(TranslateWord translates)
+        private void SerializeData(TranslateWordModel translates)
         {
             using (FileStream fs = new FileStream("ru-en.dat", FileMode.Append))
             {
@@ -33,9 +31,9 @@ namespace LanguageTranslator.Data
             }
         }
 
-        private LinkedList<TranslateWord> DeserializeData()
+        private LinkedList<TranslateWordModel> DeserializeData()
         {
-            LinkedList<TranslateWord> translates = new LinkedList<TranslateWord>();
+            LinkedList<TranslateWordModel> translates = new LinkedList<TranslateWordModel>();
 
             using (FileStream fs = new FileStream("ru-en.dat", FileMode.OpenOrCreate))
             {
@@ -44,7 +42,7 @@ namespace LanguageTranslator.Data
                     BinaryFormatter formatter = new BinaryFormatter();
                     while (fs.Position != fs.Length)
                     {
-                        translates.AddLast((TranslateWord)formatter.Deserialize(fs));
+                        translates.AddLast((TranslateWordModel)formatter.Deserialize(fs));
                     }
                     return translates;
                 }
@@ -53,16 +51,16 @@ namespace LanguageTranslator.Data
             return translates;
         }
 
-        public override bool HasTranslate(TranslateWord translate)
+        public override bool HasTranslate(TranslateWordModel translate)
         {
-            LinkedList<TranslateWord> translates = DeserializeData();
+            LinkedList<TranslateWordModel> translates = DeserializeData();
             bool hasWord, hasTranslate;
 
             hasWord = translates.Any(t =>
-                t.Word.Trim().ToLower() == translate.Word.Trim().ToLower());
+                t.WordModel.Word.Trim().ToLower() == translate.WordModel.Word.Trim().ToLower());
 
             hasTranslate = translates.Any(t =>
-                t.Translate.Trim().ToLower() == translate.Translate.Trim().ToLower());
+                t.TranslateModel.Translate.Trim().ToLower() == translate.TranslateModel.Translate.Trim().ToLower());
 
             if (hasWord || hasTranslate)
             {
@@ -70,11 +68,6 @@ namespace LanguageTranslator.Data
             }
 
             return false;
-        }
-
-        public override void SortTranslates()
-        {
-            //TODO: реализовать сортировку записей файла.
         }
     }
 }

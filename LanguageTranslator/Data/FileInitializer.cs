@@ -1,11 +1,7 @@
 ﻿using LanguageTranslator.Interfaces;
 using LanguageTranslator.Models;
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
-using System.Threading.Tasks;
 
 namespace LanguageTranslator.Data
 {
@@ -29,7 +25,7 @@ namespace LanguageTranslator.Data
                     BinaryFormatter formatter = new BinaryFormatter();
                     while (fs.Position != fs.Length)
                     {
-                        Words.translates.AddLast((TranslateWord)formatter.Deserialize(fs));
+                        Words.translates.AddLast((TranslateWordModel)formatter.Deserialize(fs));
                     }
                 }
             }
