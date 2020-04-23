@@ -16,20 +16,17 @@ namespace LanguageTranslator.Data
             if (HasTranslate(translate))
             {
                 Status = AddStatus.HAS_TRANSLATE;
-                return;
             }
-
-            Status = AddStatus.HAS_NOT_TRANSLATE;
-
-            LinkedList<TranslateWord> translates = DeserializeData();
-            translates.AddLast(translate);
-
-            SerializeData(translates);
+            else
+            {
+                Status = AddStatus.HAS_NOT_TRANSLATE;
+                SerializeData(translate);
+            }
         }
 
-        private void SerializeData(LinkedList<TranslateWord> translates)
+        private void SerializeData(TranslateWord translates)
         {
-            using (FileStream fs = new FileStream("ru-en.dat", FileMode.OpenOrCreate))
+            using (FileStream fs = new FileStream("ru-en.dat", FileMode.Append))
             {
                 BinaryFormatter formatter = new BinaryFormatter();
                 formatter.Serialize(fs, translates);
@@ -38,15 +35,22 @@ namespace LanguageTranslator.Data
 
         private LinkedList<TranslateWord> DeserializeData()
         {
+            LinkedList<TranslateWord> translates = new LinkedList<TranslateWord>();
+
             using (FileStream fs = new FileStream("ru-en.dat", FileMode.OpenOrCreate))
             {
                 if (fs.Length != 0)
                 {
                     BinaryFormatter formatter = new BinaryFormatter();
-                    return (LinkedList<TranslateWord>)formatter.Deserialize(fs);
+                    while (fs.Position != fs.Length)
+                    {
+                        translates.AddLast((TranslateWord)formatter.Deserialize(fs));
+                    }
+                    return translates;
                 }
             }
-            return new LinkedList<TranslateWord>();
+
+            return translates;
         }
 
         public override bool HasTranslate(TranslateWord translate)

@@ -15,8 +15,8 @@ namespace LanguageTranslator.Data
         {
             if (!File.Exists("ru-en.dat"))
             {
-                File.Create("ru-en.dat");
-                return;
+                FileStream create = File.Create("ru-en.dat");
+                create.Close();
             }
             else
             {
@@ -27,7 +27,10 @@ namespace LanguageTranslator.Data
                         return;
                     }
                     BinaryFormatter formatter = new BinaryFormatter();
-                    Words.translates = (LinkedList<TranslateWord>)formatter.Deserialize(fs);
+                    while (fs.Position != fs.Length)
+                    {
+                        Words.translates.AddLast((TranslateWord)formatter.Deserialize(fs));
+                    }
                 }
             }
         }

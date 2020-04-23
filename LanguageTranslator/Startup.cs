@@ -32,10 +32,10 @@ namespace LanguageTranslator
         {
             services.AddControllersWithViews();
 
-            services.AddTransient<IDataSaver, DatabaseSaver>();
+            services.AddTransient<IDataSaver, FileSaver>();
             services.AddTransient<ITranslates, TranslateRepository>();
             services.AddTransient<ISearch, SearchRepository>();
-            services.AddTransient<IInitializer, DBInitializer>();
+            services.AddTransient<IInitializer, FileInitializer>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -52,11 +52,11 @@ namespace LanguageTranslator
                 app.UseHsts();
             }
 
-            ConnectionString = Configuration["ConnectionStrings:DefaultConnection"];
-            initializer.Initialize();
-
             app.UseHttpsRedirection();
             app.UseStaticFiles();
+
+            ConnectionString = Configuration["ConnectionStrings:DefaultConnection"];
+            initializer.Initialize();
 
             app.UseRouting();
 
