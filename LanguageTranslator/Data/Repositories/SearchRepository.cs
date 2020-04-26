@@ -8,15 +8,15 @@ namespace LanguageTranslator.Data.Repositories
     {
         public string FindTranslate(string word)
         {
-            TranslateWordModel result = Words.translates
-                .FirstOrDefault(item => item.WordModel.Word.Trim().ToLower() == word.Trim().ToLower());
+            TranslateWord result = Words.translates
+                .FirstOrDefault(item => item.Word.Text.Trim().ToLower() == word.Trim().ToLower());
 
             if (result == null)
             {
                 return "Перевод не найден";
             }
 
-            return result.TranslateModel.Translate;
+            return result.Translate.Text;
         }
     }
 }

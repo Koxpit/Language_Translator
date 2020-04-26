@@ -4,6 +4,10 @@ using LanguageTranslator.Interfaces;
 using LanguageTranslator.ViewModels;
 using LanguageTranslator.Enums;
 using LanguageTranslator.Data;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace LanguageTranslator.Controllers
 {
@@ -11,6 +15,7 @@ namespace LanguageTranslator.Controllers
     {
         private readonly ITranslates translates;
         private readonly ISearch search;
+        public static IEnumerable<ILanguage> langs = MockLanguages.GetInstance().LanguagesList;
 
         public HomeController(ITranslates translates, ISearch search)
         {
@@ -21,13 +26,16 @@ namespace LanguageTranslator.Controllers
         [HttpGet]
         public IActionResult Index()
         {
-            ViewBag.translates = Words.SortTranslates();
+            ViewBag.translates = Words.GetSortedTranslates();
+            ViewBag.languages = new SelectList(langs, "Id", "Name");
+
             return View();
         }
 
         [HttpPost]
-        public IActionResult Translate(TranslateWordModel trans)
+        public IActionResult Translate(TranslateWord trans)
         {
+            ILanguage l = langs.FirstOrDefault(l => l.Id == trans.Translate.LanguageId);
             if (ModelState.IsValid)
             {
                 if (!IsCorrectLanguage(trans))
@@ -48,9 +56,9 @@ namespace LanguageTranslator.Controllers
             return View();
         }
 
-        private bool IsCorrectLanguage(TranslateWordModel trans)
+        private bool IsCorrectLanguage(TranslateWord trans)
         {
-            if (trans.WordModel.Language == trans.TranslateModel.Language)
+            if (trans.Word.LanguageId == trans.Translate.LanguageId)
             {
                 ViewData["StatusTranslate"] = "Вы выбрли два одинаковых языка. Выберите разные.";
                 return false;

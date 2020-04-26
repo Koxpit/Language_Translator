@@ -5,14 +5,14 @@ using System.ComponentModel.DataAnnotations;
 namespace LanguageTranslator.Models
 {
     [Serializable]
-    public class TranslateWordModel
+    public class TranslateWord
     {
         [Key]
         [HiddenInput(DisplayValue = false)]
         public int Id { get; set; }
 
-        public WordModel WordModel { get; set; }
+        public Word Word { get; set; }
 
-        public TranslateModel TranslateModel { get; set; }
+        public Translate Translate { get; set; }
     }
 }

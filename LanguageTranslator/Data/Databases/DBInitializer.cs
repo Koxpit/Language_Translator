@@ -11,7 +11,7 @@ namespace LanguageTranslator.Data
         {
             using (SqlConnection connection = new SqlConnection(Startup.ConnectionString))
             {
-                string sqlExpression = "SELECT * FROM RU_EN";
+                string sqlExpression = "SELECT * FROM TranslateWord";
                 using (SqlCommand command = new SqlCommand(sqlExpression, connection))
                 {
                     await connection.OpenAsync();
@@ -19,18 +19,9 @@ namespace LanguageTranslator.Data
                     SqlDataReader reader = await command.ExecuteReaderAsync();
                     while (await reader.ReadAsync())
                     {
-                        Words.translates.AddLast(new TranslateWordModel()
+                        Words.translates.AddLast(new TranslateWord()
                         {
-                            Id = reader.GetInt32(0),
-                            WordModel = new WordModel()
-                            {
-                                Word = reader.GetString(1),
-                                Language = (Languages)reader.GetInt32(3)
-                            },
-                            TranslateModel = new TranslateModel() {
-                               Translate = reader.GetString(2),
-                               Language = (Languages)reader.GetInt32(4)
-                            }
+                            // TODO: Get objects.
                         });
                     }
                     await connection.CloseAsync();

@@ -7,8 +7,8 @@ namespace LanguageTranslator.Data
     {
         public AddStatus Status { get; set; }
 
-        public abstract void SaveTranslate(TranslateWordModel translate);
+        public abstract void SaveTranslate(TranslateWord translate);
 
-        public abstract bool HasTranslate(TranslateWordModel translate);
+        public abstract bool HasTranslate(TranslateWord translate);
     }
 }

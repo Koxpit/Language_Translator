@@ -5,10 +5,10 @@ namespace LanguageTranslator.Interfaces
 {
     public interface ITranslates
     {
-        void Add(TranslateWordModel trans);
+        void Add(TranslateWord trans);
 
         AddStatus Status { get; set; }
 
-        bool IsCorrectLanguage(TranslateWordModel trans);
+        bool IsCorrectLanguage(TranslateWord trans);
     }
 }

@@ -1,6 +1,11 @@
-﻿using LanguageTranslator.Enums;
+﻿using LanguageTranslator.Controllers;
+using LanguageTranslator.Enums;
 using LanguageTranslator.Interfaces;
 using LanguageTranslator.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace LanguageTranslator.Data.Repositories
 {
@@ -15,7 +20,7 @@ namespace LanguageTranslator.Data.Repositories
             this.saver = saver;
         }
 
-        public void Add(TranslateWordModel trans)
+        public void Add(TranslateWord trans)
         {
             saver.SaveTranslate(trans);
 
@@ -26,32 +31,44 @@ namespace LanguageTranslator.Data.Repositories
                 return;
             }
 
-            Words.translates.AddLast(new TranslateWordModel
+            Words.translates.AddLast(new TranslateWord
             {
-                WordModel = trans.WordModel,
-                TranslateModel = trans.TranslateModel
+                Word = trans.Word,
+                Translate = trans.Translate
             });
+
         }
 
-        public bool IsCorrectLanguage(TranslateWordModel trans)
+        public bool IsCorrectLanguage(TranslateWord trans)
         {
-            
             bool translateIsEn = true, wordIsRu = true;
+            var translateUniCode = Startup.Langs.Where(l => l.Id == trans.Translate.LanguageId).Select(u => u.UniCode);
+            var wordUniCode = Startup.Langs.Where(l => l.Id == trans.Word.LanguageId).Select(u => u.UniCode);
 
-            foreach (char ch in trans.WordModel.Word.Trim().ToLower())
+            foreach (char ch in trans.Word.Text)
             {
-                if (ch >= 'а' && ch <= 'я')
-                    wordIsRu = true;
+                if (Regex.IsMatch(ch.ToString(), $@"{wordUniCode}"))
+                {
+                    translateIsEn = true;
+                }
                 else
-                    wordIsRu = false;
+                {
+                    translateIsEn = false;
+                    break;
+                }
             }
 
-            foreach (char ch in trans.TranslateModel.Translate.Trim().ToLower())
+            foreach (char ch in trans.Translate.Text)
             {
-                if (ch >= 'a' && ch <= 'z')
+                if (Regex.IsMatch(ch.ToString(), $@"{translateUniCode}"))
+                {
                     translateIsEn = true;
+                }
                 else
+                {
                     translateIsEn = false;
+                    break;
+                }
             }
 
             if (wordIsRu && translateIsEn)

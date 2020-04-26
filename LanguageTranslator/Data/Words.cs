@@ -6,12 +6,11 @@ namespace LanguageTranslator.Data
 {
     public class Words
     {
-        public static LinkedList<TranslateWordModel> translates = new LinkedList<TranslateWordModel>();
+        public static LinkedList<TranslateWord> translates = new LinkedList<TranslateWord>();
 
-        public static IOrderedEnumerable<TranslateWordModel> SortTranslates()
+        public static IOrderedEnumerable<TranslateWord> GetSortedTranslates()
         {
-            IOrderedEnumerable<TranslateWordModel> result = translates.OrderBy(w => w.WordModel.Word);
-            return result;
+            return translates.OrderBy(w => w.Word.Text);
         }
     }
 }

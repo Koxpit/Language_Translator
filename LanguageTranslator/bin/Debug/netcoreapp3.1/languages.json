@@ -1,0 +1,14 @@
+{
+  "Languages": [
+    {
+      "name": "Russian",
+      "code": "[\u0400-\u04FF] + ",
+      "acronym": "RU"
+    },
+    {
+      "name": "English",
+      "code": "[\u0000-\u007F]+",
+      "acronym": "EN"
+    }
+  ]
+}

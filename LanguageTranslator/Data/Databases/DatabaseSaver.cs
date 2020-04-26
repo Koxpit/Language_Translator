@@ -10,7 +10,7 @@ namespace LanguageTranslator.Data
     {
         private string Connection { get; } = Startup.ConnectionString;
 
-        public async override void SaveTranslate(TranslateWordModel translate)
+        public async override void SaveTranslate(TranslateWord translate)
         {
             if (HasTranslate(translate))
             {
@@ -26,10 +26,10 @@ namespace LanguageTranslator.Data
                 using (SqlCommand command = new SqlCommand(sqlExpression, connection))
                 {
                     await connection.OpenAsync();
-                    command.Parameters.AddWithValue("@Word", translate.WordModel.Word);
-                    command.Parameters.AddWithValue("@Translate", translate.TranslateModel.Translate);
-                    command.Parameters.AddWithValue("@WordLanguage", (int)translate.WordModel.Language);
-                    command.Parameters.AddWithValue("@TranslateLanguage", (int)translate.TranslateModel.Language);
+                    command.Parameters.AddWithValue("@Word", translate.Word.Text);
+                    command.Parameters.AddWithValue("@Translate", translate.Translate.Text);
+                    //command.Parameters.AddWithValue("@WordLanguage", (int)translate.WordModel.Language);
+                    //command.Parameters.AddWithValue("@TranslateLanguage", (int)translate.TranslateModel.Language);
                     await command.ExecuteNonQueryAsync();
                 }
 
@@ -40,17 +40,17 @@ namespace LanguageTranslator.Data
             }
         }
 
-        public override bool HasTranslate(TranslateWordModel translate)
+        public override bool HasTranslate(TranslateWord translate)
         {
             // TODO: Реализация проверки в БД
 
             bool hasWord, hasTranslate;
 
             hasWord = Words.translates.Any(t =>
-                t.WordModel.Word.Trim().ToLower() == translate.WordModel.Word.Trim().ToLower());
+                t.Word.Text.Trim().ToLower() == translate.Word.Text.Trim().ToLower());
 
             hasTranslate = Words.translates.Any(t =>
-                t.TranslateModel.Translate.Trim().ToLower() == translate.TranslateModel.Translate.Trim().ToLower());
+                t.Translate.Text.Trim().ToLower() == translate.Translate.Text.Trim().ToLower());
 
             if (hasWord || hasTranslate)
             {
